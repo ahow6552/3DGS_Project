@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3DGS Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 20px 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
+            border: 1px solid #ccc;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button.reset {
+            background-color: #f44336;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+    <!-- 引入 Three.js 和 PLYLoader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
+</head>
+<body>
+
+    <h1>3DGS Viewer</h1>
+
+    <div class="container">
+        <!-- File Upload -->
+        <div class="form-group">
+            <label for="file-upload">上傳模型檔案</label>
+            <input type="file" id="file-upload">
+        </div>
+
+        <!-- Parameter Adjustment -->
+        <div class="form-group">
+            <label for="parameter1">參數1</label>
+            <input type="number" id="parameter1" placeholder="請輸入參數值">
+        </div>
+
+        <div class="form-group">
+            <label for="parameter2">參數2</label>
+            <input type="number" id="parameter2" placeholder="請輸入參數值">
+        </div>
+
+        <!-- 3D Viewer -->
+        <div id="viewer"></div>
+
+        <!-- Buttons -->
+        <div class="buttons">
+            <button type="button" onclick="viewModel()">View</button>
+            <button type="button" class="reset" onclick="resetForm()">Reset</button>
+        </div>
+    </div>
+
+    <!-- JavaScript 部分 -->
+    <script>
+        function viewModel() {
+            const fileInput = document.getElementById('file-upload');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    const contents = event.target.result;
+                    const loader = new THREE.PLYLoader();
+                    const geometry = loader.parse(contents);
+
+                    // 創建場景、相機和渲染器
+                    const scene = new THREE.Scene();
+                    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 400, 0.1, 1000);
+                    const renderer = new THREE.WebGLRenderer();
+                    renderer.setSize(window.innerWidth, 400);
+                    document.getElementById('viewer').appendChild(renderer.domElement);
+
+                    // 添加光源
+                    const light = new THREE.DirectionalLight(0xffffff, 1);
+                    light.position.set(0, 1, 1).normalize();
+                    scene.add(light);
+
+                    // 創建材質和網格，並添加到場景中
+                    const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+                    const mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
+
+                    // 設置相機位置
+                    camera.position.z = 5;
+
+                    // 渲染循環
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        mesh.rotation.y += 0.01; // 旋轉模型
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                };
+
+                reader.readAsArrayBuffer(file);
+            } else {
+                alert('請先上傳一個模型文件。');
+            }
+        }
+
+        function resetForm() {
+            // 重置表單
+            document.getElementById('file-upload').value = '';
+            document.getElementById('parameter1').value = '';
+            document.getElementById('parameter2').value = '';
+            document.getElementById('viewer').innerHTML = ''; // 清空3D Viewer
+            alert('表單已重置');
+        }
+    </script>
+
+</body>
+</html>
