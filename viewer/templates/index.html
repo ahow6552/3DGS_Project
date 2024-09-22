@@ -77,9 +77,6 @@
             opacity: 0.9;
         }
     </style>
-    <!-- 引入 Three.js 和 PLYLoader -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
 </head>
 <body>
 
@@ -116,50 +113,20 @@
     <!-- JavaScript 部分 -->
     <script>
         function viewModel() {
+            // 檢查是否選擇了文件
             const fileInput = document.getElementById('file-upload');
-            const file = fileInput.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onload = function(event) {
-                    const contents = event.target.result;
-                    const loader = new THREE.PLYLoader();
-                    const geometry = loader.parse(contents);
-
-                    // 創建場景、相機和渲染器
-                    const scene = new THREE.Scene();
-                    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 400, 0.1, 1000);
-                    const renderer = new THREE.WebGLRenderer();
-                    renderer.setSize(window.innerWidth, 400);
-                    document.getElementById('viewer').appendChild(renderer.domElement);
-
-                    // 添加光源
-                    const light = new THREE.DirectionalLight(0xffffff, 1);
-                    light.position.set(0, 1, 1).normalize();
-                    scene.add(light);
-
-                    // 創建材質和網格，並添加到場景中
-                    const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-                    const mesh = new THREE.Mesh(geometry, material);
-                    scene.add(mesh);
-
-                    // 設置相機位置
-                    camera.position.z = 5;
-
-                    // 渲染循環
-                    function animate() {
-                        requestAnimationFrame(animate);
-                        mesh.rotation.y += 0.01; // 旋轉模型
-                        renderer.render(scene, camera);
-                    }
-                    animate();
-                };
-
-                reader.readAsArrayBuffer(file);
-            } else {
+            if (fileInput.files.length === 0) {
                 alert('請先上傳一個模型文件。');
+                return;
             }
+
+            // 獲取參數值
+            const param1 = document.getElementById('parameter1').value;
+            const param2 = document.getElementById('parameter2').value;
+
+            // 根據上傳的模型和參數值跳轉到新頁面
+            const url = `/viewer/?file=${fileInput.files[0].name}&param1=${param1}&param2=${param2}`;
+            window.location.href = url;  // 跳轉到另一個頁面
         }
 
         function resetForm() {

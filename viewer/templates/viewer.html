@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3DGS Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            margin: 20px 0;
+        }
+
+        #viewer-container {
+            width: 100%;
+            height: 80vh;
+            background-color: #000;
+            border: 1px solid #ddd;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <h1>3DGS Viewer</h1>
+
+    <!-- 3D Viewer 容器 -->
+    <div id="viewer-container"></div>
+
+    <!-- 加載 Three.js 和 PLYLoader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r128/examples/js/loaders/PLYLoader.js"></script>
+
+    <!-- 渲染3D模型的腳本 -->
+    <script>
+        // 初始化場景、相機和渲染器
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('viewer-container').appendChild(renderer.domElement);
+
+        // 加入光線
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(1, 1, 1).normalize();
+        scene.add(directionalLight);
+
+        const ambientLight = new THREE.AmbientLight(0x404040); // 添加環境光，確保模型即使在陰影中也能看見
+        scene.add(ambientLight);
+
+        // 創建 PLY 加載器
+        const loader = new THREE.PLYLoader();
+
+        // 從伺服器獲取模型文件名
+        const modelFile = '{{ file }}';  // 從 Django 傳遞的文件名
+
+        // 加載 .ply 模型
+        loader.load(`/static/uploads/${modelFile}`, function (geometry) {
+            geometry.computeVertexNormals();  // 計算頂點法線
+
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x0055ff,
+                flatShading: true,
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            // 調整相機和模型的位置
+            camera.position.z = 5;
+            camera.position.y = 2;
+
+            // 調整模型比例
+            mesh.scale.set(1, 1, 1);
+
+            // 渲染循環
+            function animate() {
+                requestAnimationFrame(animate);
+                mesh.rotation.x += 0.01;
+                mesh.rotation.y += 0.01;
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }, function(xhr) {
+            // 加載進度
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        }, function (error) {
+            // 錯誤處理
+            console.error('An error occurred while loading the .ply file', error);
+        });
+
+        // 窗口大小改變時調整視圖
+        window.addEventListener('resize', function () {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        });
+    </script>
+</body>
+</html>
