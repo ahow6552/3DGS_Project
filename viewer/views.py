@@ -1,20 +1,18 @@
-from django.shortcuts import render
+# views.py
+from django.shortcuts import render, redirect
+from .forms import FileUploadForm
 
-# 首頁視圖
-def index(request):
-    return render(request, 'index.html')
+def file_upload_view(request):
+    if request.method == 'POST':
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()  # 保存上傳的文件
+            return redirect('success')  # 成功上傳後跳轉到成功頁面
+    else:
+        form = FileUploadForm()
+    return render(request, 'upload.html', {'form': form})
 
-# 3D Viewer 視圖
-def viewer(request):
-    file = request.GET.get('file', '')
-    param1 = request.GET.get('param1', '')
-    param2 = request.GET.get('param2', '')
+# views.py
+def success_view(request):
+    return render(request, 'success.html')
 
-    # 這裡可以處理模型的展示邏輯，將參數傳遞到前端
-    context = {
-        'file': file,
-        'param1': param1,
-        'param2': param2,
-    }
-    
-    return render(request, 'viewer.html', context)
