@@ -1,18 +1,18 @@
-# views.py
-from django.shortcuts import render, redirect
-from .forms import FileUploadForm
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.core.files.storage import FileSystemStorage
+from .form import UploadFileForm
 
-def file_upload_view(request):
+def index(request):
     if request.method == 'POST':
-        form = FileUploadForm(request.POST, request.FILES)
+        form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()  # 保存上傳的文件
-            return redirect('success')  # 成功上傳後跳轉到成功頁面
+            uploaded_file = request.FILES['file']
+            fs = FileSystemStorage()
+            filename = fs.save(uploaded_file.name, uploaded_file)  # 保存檔案
+            uploaded_file_url = fs.url(filename)  # 獲取檔案的URL
+            return render(request, 'viewer.html', {'file_url': uploaded_file_url})
     else:
-        form = FileUploadForm()
-    return render(request, 'upload.html', {'form': form})
-
-# views.py
-def success_view(request):
-    return render(request, 'success.html')
-
+        form = UploadFileForm()
+    
+    return render(request, 'index.html', {'form': form})

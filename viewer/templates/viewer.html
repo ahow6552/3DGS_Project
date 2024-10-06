@@ -1,46 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viewer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>3D Gaussian Splat Demo - VR Garden</title>
+  <script type="text/javascript" src="js/util.js"></script>
+  <script type="importmap">
+    {
+        "imports": {
+            "three": "./lib/three.module.js",
+            "@mkkellogg/gaussian-splats-3d": "./lib/gaussian-splats-3d.module.js"
+        }
+    }
+  </script>
+  <style>
+
+    body {
+      background-color: #000000;
+      height: 100vh;
+      margin: 0px;
+    }
+
+  </style>
+
 </head>
+
 <body>
-    <h1>3D Model Viewer</h1>
-
-    <!-- 在B頁面顯示上傳的文件路徑 -->
-    <p>上傳的文件路徑： {{ file }} </p>
-
-    <!-- 在這裡加入 Three.js 代碼來加載和顯示該 .ply 文件 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.rawgit.com/mrdoob/three.js/r128/examples/js/loaders/PLYLoader.js"></script>
-    <script>
-        // 假設你已經在前端模板中引用了文件路徑
-        const fileUrl = "{{ file }}";
-
-        // Three.js 代碼，用來加載並渲染文件
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        const loader = new THREE.PLYLoader();
-        loader.load(fileUrl, function (geometry) {
-            const material = new THREE.MeshStandardMaterial({color: 0x0055ff, flatShading: true});
-            const mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
-            camera.position.z = 5;
-
-            function animate() {
-                requestAnimationFrame(animate);
-                mesh.rotation.x += 0.01;
-                mesh.rotation.y += 0.01;
-                renderer.render(scene, camera);
-            }
-
-            animate();
-        });
-    </script>
+  <script type="module">
+    import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
+    import * as THREE from 'three';
+    const viewer = new GaussianSplats3D.Viewer({
+      'initialCameraLookAt': [0.20786, -0.68154, -0.27311],
+      'webXRMode': GaussianSplats3D.WebXRMode.AR
+    });
+    let path = "{{ file_url }}";
+    viewer.addSplatScene(path, {
+        'rotation': new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0.01933, -0.75830, -0.65161).normalize(), new THREE.Vector3(0, 1, 0)).toArray(),
+        'scale': [0.25, 0.25, 0.25],
+        'position': [0, 0.5, 0]
+    })
+    .then(() => {
+        viewer.start();
+    });
+  </script>
 </body>
-</html>

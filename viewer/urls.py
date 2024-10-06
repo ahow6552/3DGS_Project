@@ -1,7 +1,6 @@
-from django.conf import settings
-from django.conf.urls.static import static
+from django.urls import path
+from . import views
 
 urlpatterns = [
-
-    # 其他 URL 路徑
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('', views.index, name='index'),  # 對應主頁
+]
