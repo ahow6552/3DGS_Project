@@ -1,51 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title>3DGS Demo AR</title>
-  <script type="importmap">
-    {
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>3DGS Demo AR</title>
+    <script type="importmap">
+      {
         "imports": {
-            "three": "./static/three/build/three.module.js",
-            "@mkkellogg/gaussian-splats-3d": "./static/gaussian-splats-3d/build/gaussian-splats-3d.module.js"
+          "three": "./static/three/build/three.module.js",
+          "@mkkellogg/gaussian-splats-3d": "./static/gaussian-splats-3d/build/gaussian-splats-3d.module.js"
         }
-    }
-  </script>
-  <style>
+      }
+    </script>
+    <style>
+      body {
+        background-color: #000000;
+        height: 100vh;
+        margin: 0px;
+      }
+    </style>
+  </head>
 
-    body {
-      background-color: #000000;
-      height: 100vh;
-      margin: 0px;
-    }
+  <body>
+    <script type="module">
+      import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
+      import * as THREE from "three";
 
-  </style>
+      const threeScene = new THREE.Scene();
+      const boxColor = 0xbbbbbb;
+      const boxGeometry = new THREE.BoxGeometry(2, 2, 2);
+      const boxMesh = new THREE.Mesh(
+        boxGeometry,
+        new THREE.MeshBasicMaterial({ color: boxColor })
+      );
+      boxMesh.position.set(3, 2, 2);
+      threeScene.add(boxMesh);
+      const file_path = "{{ file_url }}";
 
-</head>
-
-<body>
-  <script type="module">
-    import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
-
-    const viewer = new GaussianSplats3D.Viewer({
-        'cameraUp': [0, -1, -0.6],
-        'initialCameraPosition': [-1, -4, 6],
-        'initialCameraLookAt': [0, 4, 0]
-    });
-    viewer.addSplatScene('./media/point_cloud.ply', {
-        'splatAlphaRemovalThreshold': 5,
-        'showLoadingUI': true,
-        'position': [0, 1, 0],
-        'rotation': [0, 0, 0, 1],
-        'scale': [1.5, 1.5, 1.5]
-    })
-    .then(() => {
-        viewer.start();
-    });
-  </script>
-</body>
-
+      const viewer = new GaussianSplats3D.Viewer({
+        threeScene: threeScene,
+      });
+      viewer
+        .addSplatScene(file_path)
+        .then(() => {
+          viewer.start();
+        });
+    </script>
+  </body>
 </html>

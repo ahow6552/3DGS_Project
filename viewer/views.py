@@ -14,5 +14,9 @@ def index(request):
             return render(request, 'viewer.html', {'file_url': uploaded_file_url})
     else:
         form = UploadFileForm()
-    
+
     return render(request, 'index.html', {'form': form})
+
+def viewer(request):
+    file_url = request.GET.get('file_url', None)
+    return render(request, 'viewer.html', {'file_url': file_url})
