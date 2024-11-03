@@ -2,5 +2,5 @@ dist
 build
 node_modules
 **/*.DS_Store
-static
 media
+viewer/__pycache__/*.pyc
