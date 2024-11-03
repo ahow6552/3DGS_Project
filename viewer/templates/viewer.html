@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <title>3DGS Demo AR</title>
+    <title>3DGS Viewer Test</title>
     <script type="importmap">
       {
         "imports": {
@@ -30,12 +30,6 @@
       const threeScene = new THREE.Scene();
       const boxColor = 0xbbbbbb;
       const boxGeometry = new THREE.BoxGeometry(2, 2, 2);
-      const boxMesh = new THREE.Mesh(
-        boxGeometry,
-        new THREE.MeshBasicMaterial({ color: boxColor })
-      );
-      boxMesh.position.set(3, 2, 2);
-      threeScene.add(boxMesh);
       const file_path = "{{ file_url }}";
 
       const viewer = new GaussianSplats3D.Viewer({

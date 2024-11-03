@@ -11,7 +11,7 @@ def index(request):
             fs = FileSystemStorage()
             filename = fs.save(uploaded_file.name, uploaded_file)  # 保存檔案
             uploaded_file_url = fs.url(filename)  # 獲取檔案的URL
-            return render(request, 'viewer.html', {'file_url': uploaded_file_url})
+            return render(request, 'AR_Viewer.html', {'file_url': uploaded_file_url})
     else:
         form = UploadFileForm()
 
@@ -20,3 +20,7 @@ def index(request):
 def viewer(request):
     file_url = request.GET.get('file_url', None)
     return render(request, 'viewer.html', {'file_url': file_url})
+
+def AR_Viewer(request):
+    file_url = request.GET.get('file_url', None)
+    return render(request, 'AR_Viewer.html', {'file_url': file_url})
