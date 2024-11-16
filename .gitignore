@@ -3,4 +3,5 @@ build
 node_modules
 **/*.DS_Store
 media
-viewer/__pycache__/*.pyc
+**/**/*.pyc
+static

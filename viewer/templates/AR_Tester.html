@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <video id="camera" autoplay playsinline width="800" height="600"></video>
+    <button onclick="listCameras()">列出相機</button>
+    <button onclick="startCamera('12345abcde')">使用外接相機</button>
+
+    <script>
+      async function listCameras() {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        devices.forEach(device => {
+          if (device.kind === 'videoinput') {
+            console.log(`Label: ${device.label}, ID: ${device.deviceId}`);
+          }
+        });
+      }
+
+      async function startCamera(deviceId) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: deviceId ? { exact: deviceId } : undefined }
+          });
+          document.getElementById("camera").srcObject = stream;
+        } catch (error) {
+          console.error("Error accessing the camera:", error);
+        }
+      }
+    </script>
+  </body>
+</html>
+
