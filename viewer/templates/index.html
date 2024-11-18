@@ -6,19 +6,35 @@
     <title>3DGS File Upload</title>
 </head>
 <body>
-    <h1>Upload 3DGS Model</h1>
     <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for="file">Select a file:</label>
-        <input type="file" name="file" id="file" required>
-        <br><br>
-        <label for="parameter1">Parameter 1:</label>
-        <input type="text" name="parameter1" id="parameter1">
-        <br><br>
-        <label for="parameter2">Parameter 2:</label>
-        <input type="text" name="parameter2" id="parameter2">
-        <br><br>
-        <button type="submit">Upload</button>
-    </form>
+    {% csrf_token %}
+    <label for="file">選擇檔案:</label>
+    <input type="file" name="file" id="file" required><br><br>
+  
+    <label for="cameraSelect">選擇相機:</label>
+    <select id="cameraSelect" name="cameraId" required></select><br><br>
+  
+    <button type="submit">上傳並開始</button>
+  </form>
+  
+  <script>
+    async function listCameras() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const select = document.getElementById("cameraSelect");
+        devices.forEach(device => {
+          if (device.kind === 'videoinput') {
+            const option = document.createElement("option");
+            option.value = device.deviceId;
+            option.text = device.label || `Camera ${select.length + 1}`;
+            select.add(option);
+          }
+        });
+      } catch (error) {
+        console.error("找不到相機設備：", error);
+      }
+    }
+    listCameras();
+</script>
 </body>
 </html>

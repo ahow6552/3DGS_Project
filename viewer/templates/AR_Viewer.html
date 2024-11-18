@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <title>3DGS AR Demo</title>
+    <video id="arVideo" autoplay playsinline style="display: none;"></video>
     <script type="importmap">
       {
         "imports": {
@@ -24,22 +25,85 @@
 
   <body>
     <script type="module">
-        import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
-        import * as THREE from 'three';
-        const viewer = new GaussianSplats3D.Viewer({
-          'initialCameraLookAt': [0.20786, -0.68154, -0.27311],
-          'webXRMode': GaussianSplats3D.WebXRMode.AR
+      import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
+      import * as THREE from "three";
+
+      // 從index拿到 file & camera_id
+      const file_path = "{{ file_url }}";
+      const cameraId = "{{ camera_id }}";
+      let videoStream;
+
+      // 設置並啟動相機流
+      async function startCameraWithID(cameraId) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: cameraId } },
+          });
+
+          videoStream = stream;
+          const videoElement = document.createElement("video");
+          videoElement.srcObject = videoStream;
+          videoElement.autoplay = true;
+          videoElement.playsinline = true;
+          document.body.appendChild(videoElement);
+
+          videoElement.onloadeddata = () => {
+            initializeThreeJS(videoElement);
+          };
+        } catch (error) {
+          console.error("Failed to start camera with ID:", cameraId, error);
+        }
+      }
+
+      // 初始化 Three.js 並設置視頻流
+      function initializeThreeJS(videoElement) {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          75, // FOV
+          window.innerWidth / window.innerHeight, // 畫布比例
+          0.1, // 近裁剪面
+          1000 // 遠裁剪面
+        );
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 動態更新相機比例
+        window.addEventListener('resize', () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        const file_path = "{{ file_url }}";
-        viewer.addSplatScene(file_path, {
-            'rotation': new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0.01933, -0.75830, -0.65161).normalize(), new THREE.Vector3(0, 1, 0)).toArray(),
-            'scale': [0.25, 0.25, 0.25],
-            'position': [0, 0.5, 0]
-        })
-        .then(() => {
-            viewer.start();
+        // 渲染循環
+        function animate() {
+          requestAnimationFrame(animate);
+          renderer.render(scene, camera);
+        }
+
+        // 設置 AR Viewer 並讓其使用這個相機
+        const viewer = new GaussianSplats3D.Viewer({
+          initialCameraLookAt: [0.20786, -0.68154, -0.27311],
+          webXRMode: GaussianSplats3D.WebXRMode.AR,
+          camera: camera
         });
-      </script>
+
+        viewer.addSplatScene(file_path, {
+          rotation: new THREE.Quaternion()
+            .setFromUnitVectors(
+              new THREE.Vector3(0.01933, -0.7583, -0.65161).normalize(),
+              new THREE.Vector3(0, 1, 0)
+            )
+            .toArray(),
+          scale: [0.25, 0.25, 0.25],
+          position: [0, 0.5, 0],
+        }).then(() => {
+          viewer.start();
+        });
+      }
+
+      startCameraWithID(cameraId);
+    </script>
   </body>
 </html>

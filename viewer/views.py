@@ -5,13 +5,17 @@ from .form import UploadFileForm
 
 def index(request):
     if request.method == 'POST':
+        selected_camera_id = request.POST.get('cameraId')
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             uploaded_file = request.FILES['file']
             fs = FileSystemStorage()
             filename = fs.save(uploaded_file.name, uploaded_file)  # 保存檔案
             uploaded_file_url = fs.url(filename)  # 獲取檔案的URL
-            return render(request, 'AR_Viewer.html', {'file_url': uploaded_file_url})
+            return render(request, 'AR_Viewer.html', {
+                'file_url': uploaded_file_url,
+                'camera_id': selected_camera_id                
+            })
     else:
         form = UploadFileForm()
 

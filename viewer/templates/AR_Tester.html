@@ -1,31 +1,141 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <body>
-    <video id="camera" autoplay playsinline width="800" height="600"></video>
-    <button onclick="listCameras()">列出相機</button>
-    <button onclick="startCamera('12345abcde')">使用外接相機</button>
-
-    <script>
-      async function listCameras() {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        devices.forEach(device => {
-          if (device.kind === 'videoinput') {
-            console.log(`Label: ${device.label}, ID: ${device.deviceId}`);
-          }
-        });
-      }
-
-      async function startCamera(deviceId) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { deviceId: deviceId ? { exact: deviceId } : undefined }
-          });
-          document.getElementById("camera").srcObject = stream;
-        } catch (error) {
-          console.error("Error accessing the camera:", error);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AR Test with Camera Switching</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.157.0/examples/jsm/"
         }
       }
     </script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #cameraSelector {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 5px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <select id="cameraSelector"></select>
+    <script type="module">
+      import * as THREE from "three";
+      import { ARButton } from "three/addons/webxr/ARButton.js";
+
+      let camera, scene, renderer, cube, videoStream;
+      const cameraSelector = document.getElementById("cameraSelector");
+
+      // 初始化 AR 場景
+      function initAR() {
+        scene = new THREE.Scene();
+
+        // 設置 Three.js 相機
+        camera = new THREE.PerspectiveCamera(
+          70,
+          window.innerWidth / window.innerHeight,
+          0.01,
+          20
+        );
+
+        // 設置渲染器
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true; // 啟用 WebXR
+        document.body.appendChild(renderer.domElement);
+
+        // 添加 AR 按鈕
+        document.body.appendChild(ARButton.createButton(renderer));
+
+        // 添加立方體
+        const geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        cube = new THREE.Mesh(geometry, material);
+        cube.position.set(0, 0, -0.5);
+        scene.add(cube);
+
+        // 調整窗口大小時更新
+        window.addEventListener("resize", onWindowResize);
+
+        animate();
+      }
+
+      // 窗口大小調整處理
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      // 動畫循環
+      function animate() {
+        renderer.setAnimationLoop(() => {
+          cube.rotation.y += 0.01;
+          cube.rotation.x += 0.01;
+          renderer.render(scene, camera);
+        });
+      }
+
+      // 獲取可用攝像頭列表
+      async function getCameras() {
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const videoDevices = devices.filter((device) => device.kind === "videoinput");
+          
+          // 更新選擇器
+          cameraSelector.innerHTML = videoDevices
+            .map(
+              (device, index) =>
+                `<option value="${device.deviceId}">${device.label || `Camera ${index + 1}`}</option>`
+            )
+            .join("");
+
+          if (videoDevices.length > 0) {
+            startCamera(videoDevices[0].deviceId); // 預設啟用第一個相機
+          }
+        } catch (error) {
+          console.error("Error accessing cameras:", error);
+        }
+      }
+
+      // 啟動指定的相機
+      async function startCamera(deviceId) {
+        try {
+          if (videoStream) {
+            videoStream.getTracks().forEach((track) => track.stop()); // 停止之前的相機
+          }
+
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: deviceId } },
+          });
+
+          videoStream = stream;
+
+          // 在 AR 中相機切換通常通過 `WebXR` 自動處理，因此這裡僅管理相機流
+          console.log("Camera started:", deviceId);
+        } catch (error) {
+          console.error("Failed to start camera:", error);
+        }
+      }
+
+      // 當用戶切換相機時重新啟動
+      cameraSelector.addEventListener("change", (event) => {
+        startCamera(event.target.value);
+      });
+
+      // 初始化 AR 和攝像頭功能
+      initAR();
+      getCameras();
+    </script>
   </body>
 </html>
-
