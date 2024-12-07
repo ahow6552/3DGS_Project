@@ -79,6 +79,9 @@
   ],
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "^0.4.5",
-    "create-vite": "^6.0.1"
+    "create-vite": "^6.0.1",
+    "vite": "^6.0.3",
+    "vue-router": "^4.5.0",
+    "webpack-dev-server": "^5.1.0"
   }
 }

@@ -1,6 +1,8 @@
-dist
-build
-node_modules
+dist/
+build/
+node_modules/
 **/*.DS_Store
-media
-static
+media/
+static/
+vite-project/
+.vercel/
