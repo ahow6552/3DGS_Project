@@ -78,6 +78,7 @@
     "build/gaussian-splats-3d.module.js.map"
   ],
   "dependencies": {
-    "@mkkellogg/gaussian-splats-3d": "^0.4.5"
+    "@mkkellogg/gaussian-splats-3d": "^0.4.5",
+    "create-vite": "^6.0.1"
   }
 }
