@@ -8,6 +8,7 @@ establish local server
 
 ```
 python -m http.server 8080
-ngrok http 8080 --request-header-add='Cross-Origin-Opener-Policy: same-origin' --request-header-add='Cross-Origin-Embedder-Policy: require-corp' 
---request-header-remove='referrer'
+ngrok http 8080 \
+  --response-header-add="Cross-Origin-Opener-Policy: same-origin" \
+  --response-header-add="Cross-Origin-Embedder-Policy: require-corp" 
 ```
