@@ -1,12 +1,4 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.core.files.storage import FileSystemStorage
-
-def my_view(request):
-    response = HttpResponse('Hello, world!')
-    response['Cross-Origin-Embedder-Policy'] = 'require-corp'
-    response['Cross-Origin-Opener-Policy'] = 'same-origin'
-    return response
 
 def index(request):
     return render(request, 'index.html')

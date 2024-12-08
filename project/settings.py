@@ -58,6 +58,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
