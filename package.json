@@ -23,7 +23,8 @@
     "fix-styling": "npx stylelint **/*.scss --fix",
     "fix-js": "npx eslint src --fix",
     "lint": "npx eslint 'src/**/*.js' || true",
-    "prettify": "npx prettier --write 'src/**/*.js'"
+    "prettify": "npx prettier --write 'src/**/*.js'",
+    "dev": "vite"
   },
   "watch": {
     "build-library": {
@@ -63,8 +64,9 @@
     "npm-watch": "0.11.0",
     "prettier": "3.0.2",
     "prettier-eslint": "15.0.1",
-    "rollup": "3.28.1",
+    "rollup": "^3.29.5",
     "url-loader": "4.1.1",
+    "vite": "^6.0.3",
     "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4"
   },
@@ -79,8 +81,8 @@
   ],
   "dependencies": {
     "@mkkellogg/gaussian-splats-3d": "^0.4.5",
+    "connect": "^3.7.0",
     "create-vite": "^6.0.1",
-    "vite": "^6.0.3",
     "vue-router": "^4.5.0",
     "webpack-dev-server": "^5.1.0"
   }

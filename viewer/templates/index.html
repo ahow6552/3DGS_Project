@@ -20,21 +20,43 @@
   <script>
     async function listCameras() {
       try {
+        // 檢查瀏覽器是否支持 enumerateDevices
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+          throw new Error("瀏覽器不支持 enumerateDevices API");
+        }
+    
+        // 請求相機權限
+        await navigator.mediaDevices.getUserMedia({ video: true });
+    
+        // 列出所有的媒體設備
         const devices = await navigator.mediaDevices.enumerateDevices();
         const select = document.getElementById("cameraSelect");
-        devices.forEach(device => {
-          if (device.kind === 'videoinput') {
+    
+        select.innerHTML = ""; // 清空舊的選項
+    
+        devices.forEach((device, index) => {
+          if (device.kind === "videoinput") {
             const option = document.createElement("option");
             option.value = device.deviceId;
-            option.text = device.label || `Camera ${select.length + 1}`;
+            option.text = device.label || `相機 ${index + 1}`; // 默認標籤處理
             select.add(option);
           }
         });
+    
+        // 如果沒有檢測到相機
+        if (select.length === 0) {
+          const option = document.createElement("option");
+          option.text = "無法檢測到相機";
+          select.add(option);
+        }
       } catch (error) {
-        console.error("找不到相機設備：", error);
+        console.error("找不到相機設備或權限被拒絕：", error);
+        alert("無法訪問相機，請檢查權限設置或瀏覽器支持性。");
       }
     }
-    listCameras();
+    
+    // 在頁面加載後執行
+    listCameras();    
 </script>
 </body>
 </html>
