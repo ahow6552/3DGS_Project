@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3DGS File Upload</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3DGS File Upload</title>
 </head>
 <body>
-    <form method="POST" enctype="multipart/form-data">
-  
+  <form method="POST" enctype="multipart/form-data" action="/upload">
+    {% csrf_token %}
     <label for="cameraSelect">選擇相機:</label>
     <select id="cameraSelect" name="cameraId" required></select><br><br>
-  
     <button type="submit">上傳並開始</button>
   </form>
   
   <script>
     async function listCameras() {
       try {
+        // 確保用戶授權
+        await navigator.mediaDevices.getUserMedia({ video: true });
         const devices = await navigator.mediaDevices.enumerateDevices();
         const select = document.getElementById("cameraSelect");
         devices.forEach(device => {
@@ -28,10 +29,10 @@
           }
         });
       } catch (error) {
-        console.error("找不到相機設備：", error);
+        console.error("找不到相機設備或權限被拒絕：", error);
       }
     }
     listCameras();
-</script>
+  </script>
 </body>
 </html>
