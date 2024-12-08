@@ -8,8 +8,8 @@
     <script type="importmap">
       {
         "imports": {
-          "three": "./static/three/build/three.module.js",
-          "@mkkellogg/gaussian-splats-3d": "./static/gaussian-splats-3d/build/gaussian-splats-3d.module.js"
+          "three": "../../static/three/build/three.module.js",
+          "@mkkellogg/gaussian-splats-3d": "../../static/gaussian-splats-3d/build/gaussian-splats-3d.module.js"
         }
       }
     </script>
@@ -30,7 +30,7 @@
       const threeScene = new THREE.Scene();
       const boxColor = 0xbbbbbb;
       const boxGeometry = new THREE.BoxGeometry(2, 2, 2);
-      const file_path = "{{ file_url }}";
+      const file_path = "../../media/point_cloud.ply";
 
       const viewer = new GaussianSplats3D.Viewer({
         threeScene: threeScene,

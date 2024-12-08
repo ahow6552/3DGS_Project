@@ -1,28 +1,18 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
-from .form import UploadFileForm
+
+def my_view(request):
+    response = HttpResponse('Hello, world!')
+    response['Cross-Origin-Embedder-Policy'] = 'require-corp'
+    response['Cross-Origin-Opener-Policy'] = 'same-origin'
+    return response
 
 def index(request):
-    if request.method == 'POST':
-        selected_camera_id = request.POST.get('cameraId')
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            uploaded_file = request.FILES['file']
-            fs = FileSystemStorage()
-            filename = fs.save(uploaded_file.name, uploaded_file)  # 保存檔案
-            uploaded_file_url = fs.url(filename)  # 獲取檔案的URL
-            return render(request, 'AR_Viewer.html', {
-                'file_url': uploaded_file_url,
-                'camera_id': selected_camera_id                
-            })
-    else:
-        form = UploadFileForm()
-
-    return render(request, 'index.html', {'form': form})
+    return render(request, 'index.html')
 
 def viewer(request):
-    file_url = request.GET.get('file_url', None)
+    file_url = 'media/point_cloud.ply'
     return render(request, 'viewer.html', {'file_url': file_url})
 
 def AR_Viewer(request):
